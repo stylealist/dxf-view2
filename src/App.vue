@@ -105,12 +105,26 @@ export default {
     },
 
     methods: {
+        async fetchFileFromServer(url) {
+            try {
+                console.log("fetchFileFromServer");
+                //url = "http://localhost:10010/disaster-rest/file/test.dxf";
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const file = new File([blob], "test.dxf", { type: "application/dxf" });
+                this._OnFileSelected(file);
+            } catch (error) {
+                console.error("Error fetching file from server:", error);
+            }
+        },
         _OnFileSelected(file) {
+        console.log("file : ",file);
             if (!file) {
                 this._OnFileCleared()
                 return
             }
             if (this.dxfUrl && this.isLocalFile) {
+                console.log("this.dxfUrl : ",this.dxfUrl);
                 URL.revokeObjectURL(this.dxfUrl)
             }
             this.isLocalFile = true
@@ -408,6 +422,17 @@ export default {
     },
 
     created() {
+        var url = window.location.protocol + "//" + window.location.host;
+        var fileUrl = "";
+
+        if(url == "https://rnd1.mapinus.com"){
+            fileUrl = "https://rnd1.mapinus.com/disaster-rest/file/test.dxf";
+        }else {
+            fileUrl = "http://localhost:10010/disaster-rest/file/test.dxf";
+        }
+
+        this.fetchFileFromServer(fileUrl);
+        //this.dxfUrl = "http://localhost:10010/disaster-rest/file/test.dxf";
         //const aboutBlock = document.getElementById("about")
         //this.aboutHtml = aboutBlock.innerHTML
         //aboutBlock.style.display = "none"
